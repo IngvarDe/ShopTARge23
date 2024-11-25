@@ -24,6 +24,7 @@ namespace ShopTARge23
             builder.Services.AddScoped<IFreeToGamesServices, FreeToGamesServices>();
             builder.Services.AddScoped<IFreeToGamesServices, FreeToGamesServices>();
             builder.Services.AddScoped<ICocktailServices, CocktailServices>();
+            builder.Services.AddScoped<IEmailServices, EmailServices>();
 
 
             builder.Services.AddDbContext<ShopTARge23Context>(options =>
