@@ -23,11 +23,14 @@ namespace ShopTARge23.Controllers
         [HttpPost]
         public IActionResult SendEmail(EmailViewModel vm)
         {
+            var files = Request.Form.Files.Any() ? Request.Form.Files.ToList() : new List<IFormFile>();
+
             var dto = new EmailDto()
             {
                 To = vm.To,
                 Subject = vm.Subject,
                 Body = vm.Body,
+                Attachment = files
             };
 
             _emailServices.SendEmail(dto);

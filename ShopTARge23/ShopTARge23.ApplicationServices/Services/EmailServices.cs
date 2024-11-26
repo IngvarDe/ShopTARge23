@@ -25,10 +25,29 @@ namespace ShopTARge23.ApplicationServices.Services
             email.From.Add(MailboxAddress.Parse(_config.GetSection("EmailUserName").Value));
             email.To.Add(MailboxAddress.Parse(dto.To));
             email.Subject = dto.Subject;
-            email.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            //email.Body = new TextPart(MimeKit.Text.TextFormat.Html)
+            //{
+            //    Text = dto.Body
+            //};
+            var builder = new BodyBuilder
             {
-                Text = dto.Body
+                HtmlBody = dto.Body
             };
+
+            foreach (var file in dto.Attachment)
+            {
+                if (file.Length > 0)
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        file.CopyTo(stream);
+                        stream.Position = 0;
+                        builder.Attachments.Add(file.FileName, stream.ToArray());
+                    }
+                }
+            }
+            email.Body = builder.ToMessageBody();
+
 
             //kindlasti kasutada mailkit.net.smtp
             using var smtp = new SmtpClient();
