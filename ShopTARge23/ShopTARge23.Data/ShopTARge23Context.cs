@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using ShopTARge23.Core.Domain;
-//using Microsoft.EntityFrameworkCore.Relational;
-//using Microsoft.Data.SqlClient;
+
 
 namespace ShopTARge23.Data
 {
-    public class ShopTARge23Context : DbContext
+    public class ShopTARge23Context : IdentityDbContext<ApplicationUser>
     {
         public ShopTARge23Context(DbContextOptions<ShopTARge23Context> options) 
         : base(options) { }
@@ -14,6 +15,10 @@ namespace ShopTARge23.Data
         public DbSet<FileToApi> FileToApis { get; set; }
         public DbSet<RealEstate> RealEstates { get; set; }
         public DbSet<FileToDatabase> FileToDatabases { get; set; }
+        
+        public DbSet<IdentityRole> IdentityRoles{ get; set; }
+
+
 
 
     }
