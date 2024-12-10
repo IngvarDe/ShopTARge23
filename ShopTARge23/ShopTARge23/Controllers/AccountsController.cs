@@ -133,5 +133,31 @@ namespace ShopTARge23.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null && await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var passwordResetLink = Url.Action("ResetPassword", "Accounts", new { email = model.Email, token = token }, Request.Scheme);
+
+                    return View("ForgotPasswordConfirmation");
+                }
+                return View("ForgotPasswordConfirmation");
+            }
+            return View(model);
+        }
     }
 }
