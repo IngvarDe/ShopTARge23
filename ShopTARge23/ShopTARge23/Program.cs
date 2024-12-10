@@ -38,7 +38,7 @@ namespace ShopTARge23
                 options.Password.RequiredLength = 3;
 
                 options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
-                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.MaxFailedAccessAttempts = 2;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
             })
             .AddEntityFrameworkStores<ShopTARge23Context>()
