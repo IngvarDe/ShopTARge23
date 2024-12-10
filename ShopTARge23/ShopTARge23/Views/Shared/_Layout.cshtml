@@ -71,6 +71,17 @@
                         @if (signInManager.IsSignedIn(User))
                         {
                             <li class="nav-item dropdown">
+                                <div class="dropdown">
+                                    <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Manage Account
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <li><a class="dropdown-item" asp-controller="Accounts" asp-action="ChangePassword">Change Password</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li class="nav-item dropdown">
                                 <form method="post" asp-controller="Accounts" asp-action="Logout">
                                     <button type="submit" class="nav-link btn btn-link py-0">
                                         Logout @user.Name
