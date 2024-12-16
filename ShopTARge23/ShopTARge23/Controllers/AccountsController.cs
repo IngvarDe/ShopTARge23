@@ -2,7 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShopTARge23.Core.Domain;
+using ShopTARge23.Core.Dto;
+using ShopTARge23.Core.ServiceInterface;
+using ShopTARge23.Models;
 using ShopTARge23.Models.Accounts;
+using System.Diagnostics;
 
 namespace ShopTARge23.Controllers
 {
@@ -10,15 +14,19 @@ namespace ShopTARge23.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IEmailServices _emailsServices;
+
 
         public AccountsController
             (
                 UserManager<ApplicationUser> userManager,
-                SignInManager<ApplicationUser> signInManager
+                SignInManager<ApplicationUser> signInManager,
+                IEmailServices emailsServices
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailsServices = emailsServices;
         }
 
 
@@ -30,6 +38,7 @@ namespace ShopTARge23.Controllers
 
         [HttpPost]
         [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Register(RegisterViewModel vm)
         {
             if(ModelState.IsValid)
@@ -50,17 +59,31 @@ namespace ShopTARge23.Controllers
 
                     var confirmationLink = Url.Action("ConfirmEmail", "Accounts", new { userId = user.Id, token = token }, Request.Scheme);
 
+                    EmailTokenDto newsignup = new();
+                    newsignup.Token = token;
+                    newsignup.Body = $"Thank you for registrating: <a href=\"{confirmationLink}\">click here</a>";
+                    newsignup.Subject = "CRUD registration";
+                    newsignup.To = user.Email;
 
                     if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
                         return RedirectToAction("ListUsers", "Administrations");
                     }
 
-                    ViewBag.ErrorTitle = "Registration succesful";
-                    ViewBag.ErrorMessage = "Before you can Login, please confirm your " +
-                        "email, by clicking on the confirmation link we have emailed you";
-
-                    return View("EmailError");
+                    _emailsServices.SendEmailToken(newsignup, token);
+                    List<string> errordatas =
+                        [
+                        "Area", "Accounts",
+                        "Issue", "Success",
+                        "StatusMessage", "Registration Success",
+                        "ActedOn", $"{vm.Email}",
+                        "CreatedAccountData", $"{vm.Email}\n{vm.City}\n[password hidden]\n[password hidden]"
+                        ];
+                    ViewBag.ErrorDatas = errordatas;
+                    ViewBag.ErrorTitle = "You have successfully registered";
+                    ViewBag.ErrorMessage = "Before you can log in, please confirm email from the link" +
+                        "\nwe have emailed to your email address.";
+                    return View("ConfirmEmail");
                 }
 
                 foreach (var error in result.Errors)
@@ -129,30 +152,44 @@ namespace ShopTARge23.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            if (userId == null || token == null)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
+            if (userId == null || token == null) { return RedirectToAction("Index", "Home"); }
             var user = await _userManager.FindByIdAsync(userId);
-
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"The User ID {userId} is not valid";
+                ViewBag.ErrorMessage = $"The user with id of {userId} is not valid";
                 return View("NotFound");
             }
-
             var result = await _userManager.ConfirmEmailAsync(user, token);
-
+            List<string> errordatas =
+                        [
+                        "Area", "Accounts",
+                        "Issue", "Failure",
+                        "StatusMessage", "Confirmation Failure",
+                        "ActedOn", $"{user.Email}",
+                        "CreatedAccountData", $"{user.Email}\n{user.City}\n[password hidden]\n[password hidden]"
+                        ];
             if (result.Succeeded)
             {
+                errordatas =
+                        [
+                        "Area", "Accounts",
+                        "Issue", "Success",
+                        "StatusMessage", "Confirmation Success",
+                        "ActedOn", $"{user.Email}",
+                        "CreatedAccountData", $"{user.Email}\n{user.City}\n[password hidden]\n[password hidden]"
+                        ];
+                ViewBag.ErrorDatas = errordatas;
                 return View();
+
             }
 
+            ViewBag.ErrorDatas = errordatas;
             ViewBag.ErrorTitle = "Email cannot be confirmed";
-            return View("Error");
+            ViewBag.ErrorMessage = $"The users email, with userid of {userId}, cannot be confirmed.";
+            return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         [HttpPost]
