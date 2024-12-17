@@ -46,6 +46,22 @@ namespace ShopTARge23
             .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("CustomEmailConfirmation")
             .AddDefaultUI();
 
+
+            builder.Services.AddAuthentication()
+
+                //.AddFacebook(options =>
+                //{
+                //    options.AppId = "330287349968902";
+                //    options.AppSecret = "b254802e897c7859499e194a50320109";
+                //})
+
+                .AddGoogle(options =>
+                {
+                    options.ClientId = "253677322216-5d6osssg6eo3fog9blubssvb50t4fc8q.apps.googleusercontent.com";
+                    options.ClientSecret = "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";
+                });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
