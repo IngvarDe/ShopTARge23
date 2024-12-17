@@ -61,7 +61,7 @@ namespace ShopTARge23.Controllers
 
                     EmailTokenDto newsignup = new();
                     newsignup.Token = token;
-                    newsignup.Body = $"Thank you for registrating: <a href=\"{confirmationLink}\">click here</a>";
+                    newsignup.Body = $"Please registrate your account by: <a href=\"{confirmationLink}\">clicking here</a>";
                     newsignup.Subject = "CRUD registration";
                     newsignup.To = user.Email;
 
@@ -83,7 +83,7 @@ namespace ShopTARge23.Controllers
                     ViewBag.ErrorTitle = "You have successfully registered";
                     ViewBag.ErrorMessage = "Before you can log in, please confirm email from the link" +
                         "\nwe have emailed to your email address.";
-                    return View("ConfirmEmail");
+                    return View("ConfirmEmailMessage");
                 }
 
                 foreach (var error in result.Errors)

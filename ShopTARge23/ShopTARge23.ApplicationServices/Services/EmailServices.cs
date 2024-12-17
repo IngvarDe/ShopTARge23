@@ -78,7 +78,7 @@ namespace ShopTARge23.ApplicationServices.Services
 
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
-            //google smtp app password = GalacticTitansSMTP ucgp mjrl bdbh ilyh 
+            
             smtp.Connect(_config.GetSection("EmailHost").Value, 587, MailKit.Security.SecureSocketOptions.StartTls);
             smtp.Authenticate(_config.GetSection("EmailUserName").Value, _config.GetSection("EmailPassword").Value);
             smtp.Send(email);
