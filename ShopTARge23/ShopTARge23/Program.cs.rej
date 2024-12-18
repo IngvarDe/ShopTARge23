@@ -1,0 +1,9 @@
+diff a/ShopTARge23/ShopTARge23/Program.cs b/ShopTARge23/ShopTARge23/Program.cs	(rejected hunks)
+@@ -48,6 +48,7 @@
+                 .AddGoogle(options =>
+                 {
+                     options.ClientId = "253677322216-5d6osssg6eo3fog9blubssvb50t4fc8q.apps.googleusercontent.com";
++                    options.ClientSecret = "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";
+                 });
+ 
+ 
